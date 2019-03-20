@@ -326,11 +326,6 @@
 
 // A generic set of chatting responses. This set mimicks the classic Eliza bot.
 
-+ *
-- I'm not sure I understand you fully. Please go on.
-- Please go on.
-- Tell me more about that.
-
 + [*] (sorry|apologize|apology) [*]
 - Please don't apologize.
 - Apologies are not necessary.
@@ -397,10 +392,6 @@
 - Don't you know?
 - How likely, would you estimate?
 
-+ (hello|hi|hey|howdy|hola|hai|yo) [*]
-- How do you do. Please state your problem.
-- Hi. What seems to be your problem?
-
 + [*] computer [*]
 - Do computers worry you?
 - Why do you mention computers?
@@ -462,14 +453,6 @@
 - What do you think?
 - Perhaps I was <star>.
 - What if I had been <star>?
-
-+ i (desire|want|need) *
-- What would it mean to you if you got <star2>?
-- Why do you want <star2>?
-- Suppose you got <star2> soon.
-- What if you never got <star2>?
-- What would getting <star2> mean to you?
-- What does wanting <star2> have to do with this discussion?
 
 + i am (sad|unhappy|mad|angry|pissed|depressed) [*]
 - I am sorry to hear that you are <star>.
@@ -566,15 +549,7 @@
 - Your <star>?
 - What else comes to mind when you think of your <star>?
 
-+ can you *
-- You believe I can <star> don't you?
-- You want me to be able to <star>.
-- Perhaps you would like to be able to <star> yourself.
 
-+ can i *
-- Whether or not you can <star> depends on you more than on me.
-- Do you want to be able to <star>?
-- Perhaps you don't want to <star>.
 
 + (what|who|when|where|how) [*]
 - Why do you ask?
