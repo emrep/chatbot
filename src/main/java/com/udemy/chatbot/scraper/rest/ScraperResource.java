@@ -1,6 +1,6 @@
 package com.udemy.chatbot.scraper.rest;
 
-import com.udemy.chatbot.scraper.service.CourseService;
+import com.udemy.chatbot.scraper.service.ScraperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ScraperResource {
 
-    private final CourseService courseService;
+    private final ScraperService scraperService;
 
     @Autowired
-    public ScraperResource(CourseService courseService) {
-        this.courseService = courseService;
+    public ScraperResource(ScraperService scraperService) {
+        this.scraperService = scraperService;
     }
 
     @RequestMapping(value = "/scraping", method = RequestMethod.GET)
     public ResponseEntity scraping() {
-        courseService.scrapeContent();
+        scraperService.scrapeContent();
         return ResponseEntity.ok("ok");
     }
 

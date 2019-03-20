@@ -1,17 +1,13 @@
 package com.udemy.chatbot.scraper.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Data
 public class CategoryList {
-
-    private @Getter @Setter List<Category> results;
-
+    private List<Category> results;
     public CategoryList() {
         results = new ArrayList<>();
     }
-
 }

@@ -1,17 +1,16 @@
 package com.udemy.chatbot.scraper.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class CourseUnit {
-    private @Setter @Getter List<Course> items;
-    private @Setter @Getter Pagination pagination;
+    private List<Course> items;
+    private Pagination pagination;
     public CourseUnit() {
         this.items = new ArrayList<>();
     }

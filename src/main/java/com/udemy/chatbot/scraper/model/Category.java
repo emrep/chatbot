@@ -1,21 +1,12 @@
 package com.udemy.chatbot.scraper.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class Category {
-    private @Setter @Getter long id;
-    private @Setter @Getter String title;
-
-    @Override
-    public String toString() {
-        return "Category{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                '}';
-    }
-
+    private long id;
+    private String title;
 }

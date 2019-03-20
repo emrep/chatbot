@@ -1,5 +1,5 @@
 package com.udemy.chatbot.scraper.service;
 
-public interface CourseService {
+public interface ScraperService {
     void scrapeContent();
 }
