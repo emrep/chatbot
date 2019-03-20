@@ -1,0 +1,9 @@
+! version = 2.0
+
+// Udemy Scripts
+
++ [*] do you have * course*
+- Yes We have great <star> courses in our catalog. You may want to take a look at the following courses:
+
++ [*] course[*]
+- Hey! We have great courses in our catalog. Let me know what kind of courses you are looking for?
