@@ -8,15 +8,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import java.util.List;
 
+@Repository
 public class CourseRepositoryImpl implements CustomCourseRepository {
 
     private final MongoOperations operations;
 
-    private static final int NUMBER_OF_RECORDS=3;
+    private static final int NUMBER_OF_RECORDS = 3;
 
     @Autowired
     public CourseRepositoryImpl(MongoOperations operations) {
@@ -27,7 +29,10 @@ public class CourseRepositoryImpl implements CustomCourseRepository {
     @Override
     public List<Course> findCourses(String topic, int page) {
         final Query query = new Query();
-        query.addCriteria(Criteria.where("topic").regex("(?i)\\b" + topic + "\\b"));
+        Criteria topicCriteria = Criteria.where("topic").regex("(?i)\\b" + topic + "\\b");
+        Criteria titleCriteria = Criteria.where("title").regex("(?i)\\b" + topic + "\\b");
+        Criteria headlineCriteria = Criteria.where("headline").regex("(?i)\\b" + topic + "\\b");
+        query.addCriteria(new Criteria().orOperator(topicCriteria,titleCriteria, headlineCriteria));
         query.with(new Sort(Sort.Direction.DESC, "avgRatingRecent"));
 
         final Pageable pageableRequest = PageRequest.of(page, NUMBER_OF_RECORDS);

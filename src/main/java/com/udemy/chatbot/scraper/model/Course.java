@@ -29,4 +29,13 @@ public class Course {
     private boolean paid;
     @JsonProperty("visible_instructors")
     private List<Instructor> instructors;
+
+    public Course() {
+    }
+
+    public Course(String title, String url, List<Instructor> instructors) {
+        this.title = title;
+        this.url = url;
+        this.instructors = instructors;
+    }
 }

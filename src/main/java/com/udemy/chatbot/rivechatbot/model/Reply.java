@@ -20,10 +20,7 @@ public class Reply implements Serializable {
         this.message = message;
         this.courses = new ArrayList<>();
         courses.forEach(courseCursor -> {
-            Course course = new Course();
-            course.setTitle(courseCursor.getTitle());
-            course.setUrl(courseCursor.getUrl());
-            course.setInstructors(courseCursor.getInstructors());
+            Course course = new Course(courseCursor.getTitle(), courseCursor.getUrl(), courseCursor.getInstructors());
             this.courses.add(course);
         });
     }
