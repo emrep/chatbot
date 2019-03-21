@@ -10,9 +10,9 @@ import java.util.List;
 @Data
 public class Course {
     private Long id;
-    private Category category;
-    private Category subcategory;
-    private Category topic;
+    private String category;
+    private String subcategory;
+    private String topic;
     private String title;
     private String headline;
     @JsonProperty("num_subscribers")

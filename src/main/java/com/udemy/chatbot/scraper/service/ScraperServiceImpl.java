@@ -1,6 +1,6 @@
 package com.udemy.chatbot.scraper.service;
 
-import com.udemy.chatbot.scraper.dao.CourseRepository;
+import com.udemy.chatbot.scraper.dao.ScraperRepository;
 import com.udemy.chatbot.scraper.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,12 +23,12 @@ public class ScraperServiceImpl implements ScraperService {
     private static final String URL_DELIMETER = "/";
 
     private final RestTemplate restTemplate;
-    private final CourseRepository courseRepository;
+    private final ScraperRepository scraperRepository;
 
     @Autowired
-    public ScraperServiceImpl(RestTemplate restTemplate, CourseRepository courseRepository) {
+    public ScraperServiceImpl(RestTemplate restTemplate, ScraperRepository scraperRepository) {
         this.restTemplate = restTemplate;
-        this.courseRepository = courseRepository;
+        this.scraperRepository = scraperRepository;
     }
 
     @Override
@@ -78,14 +78,14 @@ public class ScraperServiceImpl implements ScraperService {
     private void saveCourses(Category category, Category subcategory, Category topic, CourseList courseList) {
         List<Course> courses = courseList.getUnit().getItems();
         setCategoryInfo(courses, category, subcategory, topic);
-        courseRepository.saveAll(courseList.getUnit().getItems());
+        scraperRepository.saveAll(courseList.getUnit().getItems());
     }
 
     private void setCategoryInfo(List<Course> courseList, Category category, Category subcategory, Category topic) {
         courseList.forEach(course -> {
-            course.setCategory(category);
-            course.setSubcategory(subcategory);
-            course.setTopic(topic);
+            course.setCategory(category.getTitle());
+            course.setSubcategory(subcategory.getTitle());
+            course.setTopic(topic.getTitle());
         });
 
     }
