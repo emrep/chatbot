@@ -19,17 +19,17 @@
 ! array sortnoun = newest cheapest expensive popular
 
 + *
-- I'm not sure I understand you fully. For instance you can try following messages:\n
-^ * List web development courses.\n
-^ * Show me free lectures.\n
+- I'm not sure I understand you fully. For instance you can try following messages:
+^ * List web development courses.
+^ * Show me free lectures.
 
 + [*] do you have * (@coursenoun)*
 - <set topic=<star1>>Yes We have great <star1> <star2>s in our catalog. You may want to take a look at the following courses:
 
 + [*] (@coursenoun)[*]
-- Hey! We have great <star>s in our catalog. Let me know what kind of courses you are looking for? For example;\n
-^ * I am looking for PHP courses.\n
-^ * Would you list Finance classes?\n
+- Hey! We have great <star>s in our catalog. Let me know what kind of courses you are looking for? For example;
+^ * I am looking for PHP courses.
+^ * Would you list Finance classes?
 
 + i (@desireverb) [to] [@learnverb] *
 - <set topic=<star2>>Yes We have great tutorials related to <star2> in our catalog. You may want to take a look at the following courses:

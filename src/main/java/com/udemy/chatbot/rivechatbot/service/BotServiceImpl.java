@@ -2,6 +2,7 @@ package com.udemy.chatbot.rivechatbot.service;
 
 import com.rivescript.RiveScript;
 import com.udemy.chatbot.rivechatbot.dao.CourseRepository;
+import com.udemy.chatbot.rivechatbot.model.Reply;
 import com.udemy.chatbot.scraper.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,11 @@ public class BotServiceImpl implements BotService {
     }
 
     @Override
-    public String reply(String botUserName, String message) {
-        StringBuilder reply = new StringBuilder(bot.reply(botUserName, message));
+    public Reply reply(String botUserName, String message) {
+        String repliedMessage = bot.reply(botUserName, message);
         String topic = bot.getUservar(botUserName, TOPIC);
         List<Course> suggestedCourses = courseRepository.findCourses(topic, 1);
-        suggestedCourses.forEach(course -> reply.append("\n" + course));
-        return reply.toString();
+        return new Reply(repliedMessage, suggestedCourses);
     }
 
 
