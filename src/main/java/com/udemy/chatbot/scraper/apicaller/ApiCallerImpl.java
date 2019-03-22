@@ -18,6 +18,9 @@ public class ApiCallerImpl implements ApiCaller {
     @Value("${api.caller.thread.number}")
     private int threadNumber;
 
+    @Value("${limited.data}")
+    private boolean limitedData;
+
     @Override
     public List<CourseType> getCategories(ApiCallQueue<List<CourseType>> apiCallQueue) {
         List<CourseType> resultList = new ArrayList<>();
@@ -56,6 +59,9 @@ public class ApiCallerImpl implements ApiCaller {
 
     @Override
     public void saveOtherCoursePages(ApiCallQueue<Boolean> apiCallQueue) {
+        if(limitedData) {
+            return;
+        }
         ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
         while (!apiCallQueue.isQueueEmpty()) {
             ApiCallSupplier<Boolean> apiCallSupplier = apiCallQueue.getNext();

@@ -4,6 +4,8 @@ import com.udemy.chatbot.scraper.apicaller.ApiCallQueue;
 import com.udemy.chatbot.scraper.apicaller.ApiCaller;
 import com.udemy.chatbot.scraper.dao.ScraperRepository;
 import com.udemy.chatbot.scraper.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ import java.util.Objects;
 
 @Service
 public class ScraperServiceImpl implements ScraperService {
+
+    private static final Logger log = LoggerFactory.getLogger(ScraperService.class);
+
     private static final String UDEMY_URL = "https://www.udemy.com";
     private static final String UDEMY_API_URL = UDEMY_URL + "/api-2.0";
     private static final String COURSE_CATEGORIES_URL = UDEMY_API_URL + "/course-categories";
@@ -51,7 +56,7 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     @Override
-    public void scrapeContent() {
+    public boolean scrapeContent() {
         scraperRepository.dropCollection();
         List<CourseType> categoryList  = getCategories();
 
@@ -66,14 +71,23 @@ public class ScraperServiceImpl implements ScraperService {
 
         coursePageList.forEach(coursePage -> coursePageQueue.addQueue(() -> this.saveOtherCoursePages(coursePage)));
         apiCaller.saveOtherCoursePages(coursePageQueue);
+
+        log.info("Scraping content is completed");
+
+        return categoryQueue.isFailedQueueEmpty() && subcategoryQueue.isFailedQueueEmpty() && topicQueue.isFailedQueueEmpty() && coursePageQueue.isFailedQueueEmpty();
+    }
+
+    @Override
+    public boolean retryFailedScrapingRequests() {
+        // TODO: 22-Mar-19 write code for failed scraping requests
+        return categoryQueue.isFailedQueueEmpty() && subcategoryQueue.isFailedQueueEmpty() && topicQueue.isFailedQueueEmpty() && coursePageQueue.isFailedQueueEmpty();
     }
 
     private List<CourseType> getCategories() {
         return restTemplate.getForObject(COURSE_CATEGORIES_URL, CourseTypeList.class).getResults();
     }
 
-    private List<CourseType> getSubCategories(CourseType category) throws InterruptedException {
-        Thread.sleep(threadSleepTime);
+    private List<CourseType> getSubCategories(CourseType category) {
         List<CourseType> subCategoryList = restTemplate.getForObject(COURSE_CATEGORIES_URL + URL_DELIMETER + category.getId() + SUBCATEGORIES, CourseTypeList.class).getResults();
         subCategoryList.forEach(subCategory -> {
             subCategory.setCategory(category.getTitle());
@@ -82,8 +96,7 @@ public class ScraperServiceImpl implements ScraperService {
         return subCategoryList;
     }
 
-    private List<CourseType> getTopics(CourseType subcategory) throws InterruptedException {
-        Thread.sleep(threadSleepTime);
+    private List<CourseType> getTopics(CourseType subcategory) {
         List<CourseType> topicList = restTemplate.getForObject(SUBCATEGORIES_URL + URL_DELIMETER + subcategory.getId() + LABELS, CourseTypeList.class).getResults();
         topicList.forEach(topic -> {
             topic.setCategory(subcategory.getCategory());
@@ -93,8 +106,7 @@ public class ScraperServiceImpl implements ScraperService {
         return topicList;
     }
 
-    private Pagination saveFirstCoursePage(CourseType topic) throws InterruptedException {
-        Thread.sleep(threadSleepTime);
+    private Pagination saveFirstCoursePage(CourseType topic) {
         CourseList courseList = restTemplate.getForObject(COURSE_URL + topic.getId() + COURSE_FILTER + pageSize, CourseList.class);
         saveCourses(topic, courseList);
         Pagination pagination = courseList.getUnit().getPagination();

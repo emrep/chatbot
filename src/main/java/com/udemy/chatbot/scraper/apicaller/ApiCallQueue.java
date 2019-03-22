@@ -33,4 +33,8 @@ public class ApiCallQueue<T> {
         return queued.isEmpty();
     }
 
+    public boolean isFailedQueueEmpty() {
+        return failed.isEmpty();
+    }
+
 }
