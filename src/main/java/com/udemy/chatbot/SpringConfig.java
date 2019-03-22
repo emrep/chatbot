@@ -3,17 +3,18 @@ package com.udemy.chatbot;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.Objects;
-import java.util.concurrent.Executor;
 
 @EnableScheduling
 @Configuration
@@ -26,14 +27,6 @@ public class SpringConfig implements AsyncConfigurer {
     @Value("${proxy.port}")
     private int proxyPort;
 
-    @Override
-    public Executor getAsyncExecutor() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(10);
-        scheduler.initialize();
-        return scheduler;
-    }
-
     @Bean
     public RestTemplate restTemplate() {
         if(Objects.nonNull(proxyUrl)) {
@@ -41,6 +34,17 @@ public class SpringConfig implements AsyncConfigurer {
         } else {
             return new RestTemplate();
         }
+    }
+
+    @Bean
+    @Primary
+    public TaskExecutor threadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(4);
+        executor.setThreadNamePrefix("chatbot_task_executor_thread");
+        executor.initialize();
+        return executor;
     }
 
     private RestTemplate getRestTemplateWithProxy() {

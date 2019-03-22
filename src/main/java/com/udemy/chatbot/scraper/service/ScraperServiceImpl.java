@@ -27,6 +27,9 @@ public class ScraperServiceImpl implements ScraperService {
     @Value("${scraper.page.size}")
     private String pageSize;
 
+    @Value("${api.caller.thread.sleep.time}")
+    private long threadSleepTime;
+
     private final RestTemplate restTemplate;
     private final ScraperRepository scraperRepository;
     private final ApiCallQueue<List<CourseType>> categoryQueue;
@@ -69,7 +72,8 @@ public class ScraperServiceImpl implements ScraperService {
         return restTemplate.getForObject(COURSE_CATEGORIES_URL, CourseTypeList.class).getResults();
     }
 
-    private List<CourseType> getSubCategories(CourseType category) {
+    private List<CourseType> getSubCategories(CourseType category) throws InterruptedException {
+        Thread.sleep(threadSleepTime);
         List<CourseType> subCategoryList = restTemplate.getForObject(COURSE_CATEGORIES_URL + URL_DELIMETER + category.getId() + SUBCATEGORIES, CourseTypeList.class).getResults();
         subCategoryList.forEach(subCategory -> {
             subCategory.setCategory(category.getTitle());
@@ -78,7 +82,8 @@ public class ScraperServiceImpl implements ScraperService {
         return subCategoryList;
     }
 
-    private List<CourseType> getTopics(CourseType subcategory) {
+    private List<CourseType> getTopics(CourseType subcategory) throws InterruptedException {
+        Thread.sleep(threadSleepTime);
         List<CourseType> topicList = restTemplate.getForObject(SUBCATEGORIES_URL + URL_DELIMETER + subcategory.getId() + LABELS, CourseTypeList.class).getResults();
         topicList.forEach(topic -> {
             topic.setCategory(subcategory.getCategory());
@@ -88,7 +93,8 @@ public class ScraperServiceImpl implements ScraperService {
         return topicList;
     }
 
-    private Pagination saveFirstCoursePage(CourseType topic) {
+    private Pagination saveFirstCoursePage(CourseType topic) throws InterruptedException {
+        Thread.sleep(threadSleepTime);
         CourseList courseList = restTemplate.getForObject(COURSE_URL + topic.getId() + COURSE_FILTER + pageSize, CourseList.class);
         saveCourses(topic, courseList);
         Pagination pagination = courseList.getUnit().getPagination();
@@ -96,7 +102,8 @@ public class ScraperServiceImpl implements ScraperService {
         return pagination;
     }
 
-    private Boolean saveOtherCoursePages(Pagination pagination) {
+    private Boolean saveOtherCoursePages(Pagination pagination) throws InterruptedException {
+        Thread.sleep(threadSleepTime);
         CourseType topic = pagination.getTopic();
         while(Objects.nonNull(pagination.getNext())) {
             CourseList courseList = restTemplate.getForObject(UDEMY_URL + pagination.getNext().getUrl(), CourseList.class);

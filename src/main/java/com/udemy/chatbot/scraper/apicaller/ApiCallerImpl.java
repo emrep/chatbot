@@ -2,62 +2,81 @@ package com.udemy.chatbot.scraper.apicaller;
 
 import com.udemy.chatbot.scraper.model.CourseType;
 import com.udemy.chatbot.scraper.model.Pagination;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class ApiCallerImpl implements ApiCaller {
 
+    @Value("${api.caller.thread.number}")
+    private int threadNumber;
+
     @Override
     public List<CourseType> getCategories(ApiCallQueue<List<CourseType>> apiCallQueue) {
         List<CourseType> resultList = new ArrayList<>();
-        while (!apiCallQueue.getQueued().isEmpty()) {
-            ApiCallSupplier<List<CourseType>> apiCallSupplier = apiCallQueue.getQueued().poll();
+        ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
+        while (!apiCallQueue.isQueueEmpty()) {
+            ApiCallSupplier<List<CourseType>> apiCallSupplier = apiCallQueue.getNext();
             try {
-                assert apiCallSupplier != null;
-                List<CourseType> categoryList = apiCallSupplier.get();
-                resultList.addAll(categoryList);
+                Future<List<CourseType>> future = executorService.submit(apiCallSupplier::get);
+                resultList.addAll(future.get());
                 apiCallQueue.addComplete(apiCallSupplier);
             } catch (Exception e) {
                 apiCallQueue.addFailed(apiCallSupplier);
             }
-            break;
         }
+        awaitTerminationAfterShutdown(executorService);
         return resultList;
     }
 
     @Override
     public List<Pagination> saveFirstCoursePage(ApiCallQueue<Pagination> apiCallQueue) {
         List<Pagination> resultList = new ArrayList<>();
-        while (!apiCallQueue.getQueued().isEmpty()) {
-            ApiCallSupplier<Pagination> apiCallSupplier = apiCallQueue.getQueued().poll();
+        ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
+        while (!apiCallQueue.isQueueEmpty()) {
+            ApiCallSupplier<Pagination> apiCallSupplier = apiCallQueue.getNext();
             try {
-                assert apiCallSupplier != null;
-                Pagination pagination = apiCallSupplier.get();
-                resultList.add(pagination);
+                Future<Pagination> future = executorService.submit(apiCallSupplier::get);
+                resultList.add(future.get());
                 apiCallQueue.addComplete(apiCallSupplier);
             } catch (Exception e) {
                 apiCallQueue.addFailed(apiCallSupplier);
             }
-            break;
         }
+        awaitTerminationAfterShutdown(executorService);
         return resultList;
     }
 
     @Override
     public void saveOtherCoursePages(ApiCallQueue<Boolean> apiCallQueue) {
-        while (!apiCallQueue.getQueued().isEmpty()) {
-            ApiCallSupplier<Boolean> apiCallSupplier = apiCallQueue.getQueued().poll();
+        ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
+        while (!apiCallQueue.isQueueEmpty()) {
+            ApiCallSupplier<Boolean> apiCallSupplier = apiCallQueue.getNext();
             try {
-                assert apiCallSupplier != null;
-                apiCallSupplier.get();
+                executorService.submit(apiCallSupplier::get);
                 apiCallQueue.addComplete(apiCallSupplier);
             } catch (Exception e) {
                 apiCallQueue.addFailed(apiCallSupplier);
             }
-            return;
+        }
+    }
+
+    private void awaitTerminationAfterShutdown(ExecutorService threadPool) {
+        threadPool.shutdown();
+        try {
+            if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) {
+                threadPool.shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            threadPool.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 }
