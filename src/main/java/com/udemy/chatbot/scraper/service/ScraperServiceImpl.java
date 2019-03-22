@@ -29,15 +29,15 @@ public class ScraperServiceImpl implements ScraperService {
 
     private final RestTemplate restTemplate;
     private final ScraperRepository scraperRepository;
-    private final ApiCallQueue categoryQueue;
-    private final ApiCallQueue subcategoryQueue;
-    private final ApiCallQueue topicQueue;
-    private final ApiCallQueue coursePageQueue;
+    private final ApiCallQueue<List<CourseType>> categoryQueue;
+    private final ApiCallQueue<List<CourseType>> subcategoryQueue;
+    private final ApiCallQueue<Pagination> topicQueue;
+    private final ApiCallQueue<Boolean> coursePageQueue;
     private final ApiCaller apiCaller;
 
 
     @Autowired
-    public ScraperServiceImpl(RestTemplate restTemplate, ScraperRepository scraperRepository, ApiCallQueue categoryQueue, ApiCallQueue subcategoryQueue, ApiCallQueue topicQueue, ApiCallQueue coursePageQueue, ApiCaller apiCaller) {
+    public ScraperServiceImpl(RestTemplate restTemplate, ScraperRepository scraperRepository, ApiCallQueue<List<CourseType>> categoryQueue, ApiCallQueue<List<CourseType>> subcategoryQueue, ApiCallQueue<Pagination> topicQueue, ApiCallQueue<Boolean> coursePageQueue, ApiCaller apiCaller) {
         this.restTemplate = restTemplate;
         this.scraperRepository = scraperRepository;
         this.categoryQueue = categoryQueue;

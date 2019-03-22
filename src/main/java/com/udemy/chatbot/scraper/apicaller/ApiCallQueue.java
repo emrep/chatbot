@@ -10,21 +10,21 @@ import java.util.Queue;
 @Component
 @Scope("prototype")
 @Data
-public class ApiCallQueue {
-    private Queue<ApiCallSupplier> queued = new LinkedList<>();
-    private Queue<ApiCallSupplier> complete = new LinkedList<>();
-    private Queue<ApiCallSupplier> failed = new LinkedList<>();
+public class ApiCallQueue<T> {
+    private Queue<ApiCallSupplier<T>> queued = new LinkedList<>();
+    private Queue<ApiCallSupplier<T>> complete = new LinkedList<>();
+    private Queue<ApiCallSupplier<T>> failed = new LinkedList<>();
 
 
-    public void addQueue(ApiCallSupplier apiCallSupplier) {
+    public void addQueue(ApiCallSupplier<T> apiCallSupplier) {
         queued.add(apiCallSupplier);
     }
 
-    void addFailed(ApiCallSupplier apiCallSupplier) {
+    void addFailed(ApiCallSupplier<T> apiCallSupplier) {
        failed.add(apiCallSupplier);
     }
 
-    void addComplete(ApiCallSupplier apiCallSupplier) {
+    void addComplete(ApiCallSupplier<T> apiCallSupplier) {
         complete.add(apiCallSupplier);
     }
 

@@ -11,13 +11,13 @@ import java.util.List;
 public class ApiCallerImpl implements ApiCaller {
 
     @Override
-    public List<CourseType> getCategories(ApiCallQueue apiCallQueue) {
+    public List<CourseType> getCategories(ApiCallQueue<List<CourseType>> apiCallQueue) {
         List<CourseType> resultList = new ArrayList<>();
         while (!apiCallQueue.getQueued().isEmpty()) {
-            ApiCallSupplier apiCallSupplier = apiCallQueue.getQueued().poll();
+            ApiCallSupplier<List<CourseType>> apiCallSupplier = apiCallQueue.getQueued().poll();
             try {
                 assert apiCallSupplier != null;
-                List<CourseType> categoryList = (List<CourseType>) apiCallSupplier.get();
+                List<CourseType> categoryList = apiCallSupplier.get();
                 resultList.addAll(categoryList);
                 apiCallQueue.addComplete(apiCallSupplier);
             } catch (Exception e) {
@@ -29,13 +29,13 @@ public class ApiCallerImpl implements ApiCaller {
     }
 
     @Override
-    public List<Pagination> saveFirstCoursePage(ApiCallQueue apiCallQueue) {
+    public List<Pagination> saveFirstCoursePage(ApiCallQueue<Pagination> apiCallQueue) {
         List<Pagination> resultList = new ArrayList<>();
         while (!apiCallQueue.getQueued().isEmpty()) {
-            ApiCallSupplier apiCallSupplier = apiCallQueue.getQueued().poll();
+            ApiCallSupplier<Pagination> apiCallSupplier = apiCallQueue.getQueued().poll();
             try {
                 assert apiCallSupplier != null;
-                Pagination pagination = (Pagination) apiCallSupplier.get();
+                Pagination pagination = apiCallSupplier.get();
                 resultList.add(pagination);
                 apiCallQueue.addComplete(apiCallSupplier);
             } catch (Exception e) {
@@ -47,9 +47,9 @@ public class ApiCallerImpl implements ApiCaller {
     }
 
     @Override
-    public void saveOtherCoursePages(ApiCallQueue apiCallQueue) {
+    public void saveOtherCoursePages(ApiCallQueue<Boolean> apiCallQueue) {
         while (!apiCallQueue.getQueued().isEmpty()) {
-            ApiCallSupplier apiCallSupplier = apiCallQueue.getQueued().poll();
+            ApiCallSupplier<Boolean> apiCallSupplier = apiCallQueue.getQueued().poll();
             try {
                 assert apiCallSupplier != null;
                 apiCallSupplier.get();
