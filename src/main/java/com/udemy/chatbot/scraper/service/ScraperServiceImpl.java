@@ -3,6 +3,7 @@ package com.udemy.chatbot.scraper.service;
 import com.udemy.chatbot.scraper.dao.ScraperRepository;
 import com.udemy.chatbot.scraper.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,8 +20,10 @@ public class ScraperServiceImpl implements ScraperService {
     private static final String SUBCATEGORIES = "/subcategories";
     private static final String LABELS = "/labels";
     private static final String COURSE_FILTER = "&fl=lbl&sos=pl&p=1&page_size=";
-    private static final String PAGE_SIZE = "20";
     private static final String URL_DELIMETER = "/";
+
+    @Value("${scraper.page.size}")
+    private String pageSize;
 
     private final RestTemplate restTemplate;
     private final ScraperRepository scraperRepository;
@@ -33,6 +36,7 @@ public class ScraperServiceImpl implements ScraperService {
 
     @Override
     public void scrapeContent() {
+        scraperRepository.dropCollection();
         List<Category> categoryList  = getCategories();
         for (Category category : categoryList) {
             List<Category> subCategoryList  = getSubCategories(category);
@@ -62,7 +66,7 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     private Pagination saveFirstCoursePage(Category category, Category subcategory, Category topic) {
-        CourseList courseList = restTemplate.getForObject(COURSE_URL + topic.getId() + COURSE_FILTER + PAGE_SIZE, CourseList.class);
+        CourseList courseList = restTemplate.getForObject(COURSE_URL + topic.getId() + COURSE_FILTER + pageSize, CourseList.class);
         saveCourses(category, subcategory, topic, courseList);
         return courseList.getUnit().getPagination();
     }

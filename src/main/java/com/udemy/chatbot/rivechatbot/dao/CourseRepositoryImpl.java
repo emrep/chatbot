@@ -2,6 +2,7 @@ package com.udemy.chatbot.rivechatbot.dao;
 
 import com.udemy.chatbot.scraper.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,7 +19,8 @@ public class CourseRepositoryImpl implements CustomCourseRepository {
 
     private final MongoOperations operations;
 
-    private static final int NUMBER_OF_RECORDS = 3;
+    @Value("${chatbot.suggested.course.number}")
+    private int suggestedCourseNumber = 3;
 
     @Autowired
     public CourseRepositoryImpl(MongoOperations operations) {
@@ -35,7 +37,7 @@ public class CourseRepositoryImpl implements CustomCourseRepository {
         query.addCriteria(new Criteria().orOperator(topicCriteria,titleCriteria, headlineCriteria));
         query.with(new Sort(Sort.Direction.DESC, "avgRatingRecent"));
 
-        final Pageable pageableRequest = PageRequest.of(page, NUMBER_OF_RECORDS);
+        final Pageable pageableRequest = PageRequest.of(page, suggestedCourseNumber);
         query.with(pageableRequest);
 
         return this.operations.find(query, Course.class);
