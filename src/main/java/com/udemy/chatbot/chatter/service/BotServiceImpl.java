@@ -1,8 +1,8 @@
-package com.udemy.chatbot.rivechatbot.service;
+package com.udemy.chatbot.chatter.service;
 
 import com.rivescript.RiveScript;
-import com.udemy.chatbot.rivechatbot.dao.CourseRepository;
-import com.udemy.chatbot.rivechatbot.model.Reply;
+import com.udemy.chatbot.chatter.dao.CourseRepository;
+import com.udemy.chatbot.chatter.model.Reply;
 import com.udemy.chatbot.scraper.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

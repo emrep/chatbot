@@ -1,4 +1,4 @@
-package com.udemy.chatbot.rivechatbot.model;
+package com.udemy.chatbot.chatter.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.udemy.chatbot.scraper.model.Course;

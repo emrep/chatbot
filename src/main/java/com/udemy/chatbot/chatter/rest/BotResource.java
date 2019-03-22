@@ -1,6 +1,6 @@
-package com.udemy.chatbot.rivechatbot.rest;
+package com.udemy.chatbot.chatter.rest;
 
-import com.udemy.chatbot.rivechatbot.service.BotService;
+import com.udemy.chatbot.chatter.service.BotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

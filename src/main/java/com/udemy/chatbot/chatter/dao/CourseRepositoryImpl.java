@@ -1,4 +1,4 @@
-package com.udemy.chatbot.rivechatbot.dao;
+package com.udemy.chatbot.chatter.dao;
 
 import com.udemy.chatbot.scraper.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
