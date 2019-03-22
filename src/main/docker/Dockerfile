@@ -1,6 +1,6 @@
 FROM java:8
 VOLUME /tmp
-COPY ./rivescript /home/rivescript
+COPY ./classes/rivescript /home/rivescript
 ADD chatbot-0.0.1-SNAPSHOT.jar app.jar
 RUN bash -c 'touch /app.jar'
 ENV JAVA_OPTS=""
