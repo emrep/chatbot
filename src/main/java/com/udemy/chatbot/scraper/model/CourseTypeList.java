@@ -5,9 +5,9 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 @Data
-public class CategoryList {
-    private List<Category> results;
-    public CategoryList() {
+public class CourseTypeList {
+    private List<CourseType> results;
+    public CourseTypeList() {
         results = new ArrayList<>();
     }
 }

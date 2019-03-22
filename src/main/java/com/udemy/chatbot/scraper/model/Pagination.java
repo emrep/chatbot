@@ -12,4 +12,5 @@ public class Pagination {
     @JsonProperty("current_page")
     private int currentPage;
     private Next next;
+    private CourseType topic;
 }
