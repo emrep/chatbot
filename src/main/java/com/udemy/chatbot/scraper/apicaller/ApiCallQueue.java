@@ -17,7 +17,7 @@ public class ApiCallQueue<T> {
         queued.add(apiCallSupplier);
     }
 
-    void addFailed(ApiCallSupplier<T> apiCallSupplier) {
+    public void addFailed(ApiCallSupplier<T> apiCallSupplier) {
        failed.add(apiCallSupplier);
     }
 
