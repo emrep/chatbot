@@ -29,10 +29,10 @@ public class SpringConfig implements AsyncConfigurer {
 
     @Bean
     public RestTemplate restTemplate() {
-        if(Objects.nonNull(proxyUrl)) {
-            return getRestTemplateWithProxy();
-        } else {
+        if(proxyUrl.isEmpty()) {
             return new RestTemplate();
+        } else {
+            return getRestTemplateWithProxy();
         }
     }
 
