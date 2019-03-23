@@ -1,7 +1,5 @@
 package com.udemy.chatbot.scraper.apicaller;
 
-import com.udemy.chatbot.scraper.model.CourseType;
-import com.udemy.chatbot.scraper.model.Pagination;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

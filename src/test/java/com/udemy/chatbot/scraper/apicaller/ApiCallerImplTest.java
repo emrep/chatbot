@@ -5,15 +5,12 @@ import com.udemy.chatbot.scraper.model.Pagination;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class ApiCallerImplTest {
 
     ApiCallerImpl apiCaller;
@@ -36,7 +33,7 @@ class ApiCallerImplTest {
     }
 
     @Test
-    @DisplayName("When getting an exception during an api request, add the api request to failed queue")
+    @DisplayName("When getting an exception during an api request, add the api request to the Failed Queue")
     void addFailedQueue() {
         ApiCallQueue<Pagination> apiCallQueue = new ApiCallQueue<>();
         apiCallQueue.addQueue(() -> {throw new Exception();});
