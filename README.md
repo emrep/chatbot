@@ -3,9 +3,17 @@ In this project, An API scraper is implemented by using Udemy Restful APIs that 
 The implemented API scraper store the course and instructor data in [MongoDB](https://www.mongodb.com/)
 
 
+
+scraping
 lombok
 rivescript
 docker
+Spring
+Spring parameters
+maven commands
+Testing
+
+
  
 
 
