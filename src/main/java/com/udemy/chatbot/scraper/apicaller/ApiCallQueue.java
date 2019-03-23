@@ -37,4 +37,9 @@ public class ApiCallQueue<T> {
         return failed.isEmpty();
     }
 
+    public void moveFailedToQueued() {
+        while(!failed.isEmpty()) {
+            queued.add(failed.poll());
+        }
+    }
 }

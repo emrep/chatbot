@@ -36,17 +36,6 @@ public class SpringConfig implements AsyncConfigurer {
         }
     }
 
-    @Bean
-    @Primary
-    public TaskExecutor threadPoolTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(4);
-        executor.setThreadNamePrefix("chatbot_task_executor_thread");
-        executor.initialize();
-        return executor;
-    }
-
     private RestTemplate getRestTemplateWithProxy() {
         SimpleClientHttpRequestFactory clientHttpReq = new SimpleClientHttpRequestFactory();
         Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyUrl, proxyPort));

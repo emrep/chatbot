@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,6 +36,8 @@ public class ScraperServiceImpl implements ScraperService {
     @Value("${api.caller.thread.sleep.time}")
     private long threadSleepTime;
 
+    private EnumScrapingState scrapingState = EnumScrapingState.NOT_STARTED;
+
     private final RestTemplate restTemplate;
     private final ScraperRepository scraperRepository;
     private final ApiCallQueue<List<CourseType>> categoryQueue;
@@ -57,10 +60,42 @@ public class ScraperServiceImpl implements ScraperService {
 
     @Override
     public boolean scrapeContent() {
+        scrapingState = EnumScrapingState.IN_PROGRESS;
         scraperRepository.dropCollection();
-        List<CourseType> categoryList  = getCategories();
 
+        List<CourseType> categoryList = scrapeCategories();
+
+        if(categoryList.isEmpty()) {
+            scrapingState = EnumScrapingState.FAILED;
+            return false;
+        }
+
+
+        return scrapeCourses();
+    }
+
+    @Override
+    public boolean retryFailedScrapingRequests() {
+        scrapingState = EnumScrapingState.RETRYING;
+        categoryQueue.moveFailedToQueued();
+        subcategoryQueue.moveFailedToQueued();
+        topicQueue.moveFailedToQueued();
+        coursePageQueue.moveFailedToQueued();
+        return scrapeCourses();
+    }
+
+    @Override
+    public EnumScrapingState getScrapingState() {
+        return scrapingState;
+    }
+
+    private List<CourseType> scrapeCategories() {
+        List<CourseType> categoryList  = getCategories();
         categoryList.forEach(category -> categoryQueue.addQueue(() -> this.getSubCategories(category)));
+        return categoryList;
+    }
+
+    private boolean scrapeCourses() {
         List<CourseType> subCategoryList = apiCaller.getCategories(categoryQueue);
 
         subCategoryList.forEach(subcategory -> subcategoryQueue.addQueue(() -> this.getTopics(subcategory)));
@@ -72,23 +107,24 @@ public class ScraperServiceImpl implements ScraperService {
         coursePageList.forEach(coursePage -> coursePageQueue.addQueue(() -> this.saveOtherCoursePages(coursePage)));
         apiCaller.saveOtherCoursePages(coursePageQueue);
 
+        boolean isSuccessful = categoryQueue.isFailedQueueEmpty() && subcategoryQueue.isFailedQueueEmpty() && topicQueue.isFailedQueueEmpty() && coursePageQueue.isFailedQueueEmpty();
+
+        if(isSuccessful){
+            scrapingState = EnumScrapingState.COMPLETED;
+        } else {
+            scrapingState = EnumScrapingState.PARTIALLY_COMPLETED;
+        }
         log.info("Scraping content is completed");
-
-        return categoryQueue.isFailedQueueEmpty() && subcategoryQueue.isFailedQueueEmpty() && topicQueue.isFailedQueueEmpty() && coursePageQueue.isFailedQueueEmpty();
-    }
-
-    @Override
-    public boolean retryFailedScrapingRequests() {
-        // TODO: 22-Mar-19 write code for failed scraping requests
-        return categoryQueue.isFailedQueueEmpty() && subcategoryQueue.isFailedQueueEmpty() && topicQueue.isFailedQueueEmpty() && coursePageQueue.isFailedQueueEmpty();
+        return isSuccessful;
     }
 
     private List<CourseType> getCategories() {
-        return restTemplate.getForObject(COURSE_CATEGORIES_URL, CourseTypeList.class).getResults();
+        return requestCategoryApi(COURSE_CATEGORIES_URL);
     }
 
     private List<CourseType> getSubCategories(CourseType category) {
-        List<CourseType> subCategoryList = restTemplate.getForObject(COURSE_CATEGORIES_URL + URL_DELIMETER + category.getId() + SUBCATEGORIES, CourseTypeList.class).getResults();
+        String url = COURSE_CATEGORIES_URL + URL_DELIMETER + category.getId() + SUBCATEGORIES;
+        List<CourseType> subCategoryList = requestCategoryApi(url);
         subCategoryList.forEach(subCategory -> {
             subCategory.setCategory(category.getTitle());
             subCategory.setSubCategory(subCategory.getTitle());
@@ -97,7 +133,8 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     private List<CourseType> getTopics(CourseType subcategory) {
-        List<CourseType> topicList = restTemplate.getForObject(SUBCATEGORIES_URL + URL_DELIMETER + subcategory.getId() + LABELS, CourseTypeList.class).getResults();
+        String url = SUBCATEGORIES_URL + URL_DELIMETER + subcategory.getId() + LABELS;
+        List<CourseType> topicList = requestCategoryApi(url);
         topicList.forEach(topic -> {
             topic.setCategory(subcategory.getCategory());
             topic.setSubCategory(subcategory.getSubCategory());
@@ -107,7 +144,8 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     private Pagination saveFirstCoursePage(CourseType topic) {
-        CourseList courseList = restTemplate.getForObject(COURSE_URL + topic.getId() + COURSE_FILTER + pageSize, CourseList.class);
+        String url = COURSE_URL + topic.getId() + COURSE_FILTER + pageSize;
+        CourseList courseList = requestCourseApi(url);
         saveCourses(topic, courseList);
         Pagination pagination = courseList.getUnit().getPagination();
         pagination.setTopic(topic);
@@ -118,11 +156,24 @@ public class ScraperServiceImpl implements ScraperService {
         Thread.sleep(threadSleepTime);
         CourseType topic = pagination.getTopic();
         while(Objects.nonNull(pagination.getNext())) {
-            CourseList courseList = restTemplate.getForObject(UDEMY_URL + pagination.getNext().getUrl(), CourseList.class);
+            String url = UDEMY_URL + pagination.getNext().getUrl();
+            CourseList courseList = requestCourseApi(url);
             saveCourses(topic, courseList);
             pagination = courseList.getUnit().getPagination();
         }
         return true;
+    }
+
+    private List<CourseType> requestCategoryApi(String url) {
+        List<CourseType> result = restTemplate.getForObject(url, CourseTypeList.class).getResults();
+        log.info("Requested URL: {}", url);
+        return Objects.nonNull(result) ? result : Collections.emptyList();
+    }
+
+    private CourseList requestCourseApi(String url) {
+        CourseList courseList = restTemplate.getForObject(url, CourseList.class);
+        log.info("Requested URL: {}", url);
+        return courseList;
     }
 
     private void saveCourses(CourseType topic, CourseList courseList) {
