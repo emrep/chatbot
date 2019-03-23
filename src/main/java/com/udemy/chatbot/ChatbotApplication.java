@@ -12,9 +12,8 @@ public class ChatbotApplication {
 		ConfigurableApplicationContext context = SpringApplication.run(ChatbotApplication.class, args);
 		ScraperService scraperService = context.getBean(ScraperService.class);
 		boolean isSuccessful = scraperService.scrapeContent();
-		if(!isSuccessful) {
-			// TODO: 22-Mar-19 Scheduling a Task for retry of failed scraping request
-			scraperService.retryFailedScrapingRequests();
+		while(!isSuccessful) {// TODO: 22-Mar-19 Scheduling a 'Retry Scraping Task'
+			isSuccessful = scraperService.retryFailedScrapingRequests();
 		}
 	}
 

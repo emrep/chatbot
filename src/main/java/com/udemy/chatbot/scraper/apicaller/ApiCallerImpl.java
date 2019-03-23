@@ -2,6 +2,7 @@ package com.udemy.chatbot.scraper.apicaller;
 
 import com.udemy.chatbot.scraper.model.CourseType;
 import com.udemy.chatbot.scraper.model.Pagination;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class ApiCallerImpl implements ApiCaller {
 
     @Value("${api.caller.thread.number}")
-    private int threadNumber;
+    private @Setter int threadNumber;
 
     @Value("${limited.data}")
     private boolean limitedData;
