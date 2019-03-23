@@ -19,64 +19,24 @@ public class ApiCallerImpl implements ApiCaller {
     @Value("${api.caller.thread.number}")
     private @Setter int threadNumber;
 
-    @Value("${limited.data}")
-    private boolean limitedData;
-
     @Override
-    public List<CourseType> getCategories(ApiCallQueue<List<CourseType>> apiCallQueue) {
-        List<CourseType> resultList = new ArrayList<>();
+    public <T> List<T> run(ApiCallQueue<T> apiCallQueue, boolean waitOtherThreads) {
+        List<T> resultList = new ArrayList<>();
         ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
         while (!apiCallQueue.isQueueEmpty()) {
-            ApiCallSupplier<List<CourseType>> apiCallSupplier = apiCallQueue.getNext();
+            ApiCallSupplier<T> apiCallSupplier = apiCallQueue.getNext();
             try {
-                Future<List<CourseType>> future = executorService.submit(apiCallSupplier::get);
-                if(limitedData) {
-                    resultList.add(future.get().get(0));
-                } else {
-                    resultList.addAll(future.get());
-                }
-                apiCallQueue.addComplete(apiCallSupplier);
-            } catch (Exception e) {
-                apiCallQueue.addFailed(apiCallSupplier);
-            }
-        }
-        awaitTerminationAfterShutdown(executorService);
-        return resultList;
-    }
-
-    @Override
-    public List<Pagination> saveFirstCoursePage(ApiCallQueue<Pagination> apiCallQueue) {
-        List<Pagination> resultList = new ArrayList<>();
-        ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
-        while (!apiCallQueue.isQueueEmpty()) {
-            ApiCallSupplier<Pagination> apiCallSupplier = apiCallQueue.getNext();
-            try {
-                Future<Pagination> future = executorService.submit(apiCallSupplier::get);
+                Future<T> future = executorService.submit(apiCallSupplier::get);
                 resultList.add(future.get());
                 apiCallQueue.addComplete(apiCallSupplier);
             } catch (Exception e) {
                 apiCallQueue.addFailed(apiCallSupplier);
             }
         }
-        awaitTerminationAfterShutdown(executorService);
+        if(waitOtherThreads) {
+            awaitTerminationAfterShutdown(executorService);
+        }
         return resultList;
-    }
-
-    @Override
-    public void saveOtherCoursePages(ApiCallQueue<Boolean> apiCallQueue) {
-        if(limitedData) {
-            return;
-        }
-        ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
-        while (!apiCallQueue.isQueueEmpty()) {
-            ApiCallSupplier<Boolean> apiCallSupplier = apiCallQueue.getNext();
-            try {
-                executorService.submit(apiCallSupplier::get);
-                apiCallQueue.addComplete(apiCallSupplier);
-            } catch (Exception e) {
-                apiCallQueue.addFailed(apiCallSupplier);
-            }
-        }
     }
 
     private void awaitTerminationAfterShutdown(ExecutorService threadPool) {

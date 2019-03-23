@@ -32,7 +32,8 @@ public class ScraperServiceImpl implements ScraperService {
 
     @Value("${scraper.page.size}")
     private String pageSize;
-
+    @Value("${limited.data}")
+    private boolean limitedData;
     @Value("${api.caller.thread.sleep.time}")
     private long threadSleepTime;
 
@@ -45,7 +46,6 @@ public class ScraperServiceImpl implements ScraperService {
     private final ApiCallQueue<Pagination> topicQueue;
     private final ApiCallQueue<Boolean> coursePageQueue;
     private final ApiCaller apiCaller;
-
 
     @Autowired
     public ScraperServiceImpl(RestTemplate restTemplate, ScraperRepository scraperRepository, ApiCallQueue<List<CourseType>> categoryQueue, ApiCallQueue<List<CourseType>> subcategoryQueue, ApiCallQueue<Pagination> topicQueue, ApiCallQueue<Boolean> coursePageQueue, ApiCaller apiCaller) {
@@ -69,7 +69,6 @@ public class ScraperServiceImpl implements ScraperService {
             scrapingState = EnumScrapingState.FAILED;
             return false;
         }
-
 
         return scrapeCourses();
     }
@@ -96,26 +95,53 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     private boolean scrapeCourses() {
-        List<CourseType> subCategoryList = apiCaller.getCategories(categoryQueue);
+        List<List<CourseType>> subCategoryList = apiCaller.run(categoryQueue, true);
 
-        subCategoryList.forEach(subcategory -> subcategoryQueue.addQueue(() -> this.getTopics(subcategory)));
-        List<CourseType> topicList = apiCaller.getCategories(subcategoryQueue);
+        fillSubcategoryQueue(subCategoryList);
+        List<List<CourseType>> topicList = apiCaller.run(subcategoryQueue, true);
 
-        topicList.forEach(topic -> topicQueue.addQueue(() -> this.saveFirstCoursePage(topic)));
-        List<Pagination> coursePageList = apiCaller.saveFirstCoursePage(topicQueue);
+        fillTopicQueue(topicList);
+        List<Pagination> coursePageList = apiCaller.run(topicQueue, true);
 
-        coursePageList.forEach(coursePage -> coursePageQueue.addQueue(() -> this.saveOtherCoursePages(coursePage)));
-        apiCaller.saveOtherCoursePages(coursePageQueue);
+        if(!limitedData) {
+            fillCoursePageQueue(coursePageList);
+            apiCaller.run(coursePageQueue, false);
+        }
 
         boolean isSuccessful = categoryQueue.isFailedQueueEmpty() && subcategoryQueue.isFailedQueueEmpty() && topicQueue.isFailedQueueEmpty() && coursePageQueue.isFailedQueueEmpty();
 
         if(isSuccessful){
             scrapingState = EnumScrapingState.COMPLETED;
+            log.info("Scraping content is completed");
         } else {
             scrapingState = EnumScrapingState.PARTIALLY_COMPLETED;
         }
-        log.info("Scraping content is completed");
+
         return isSuccessful;
+    }
+
+    private void fillSubcategoryQueue(List<List<CourseType>> subCategoryList) {
+        subCategoryList.forEach(subcategories -> {
+            if(limitedData && !subcategories.isEmpty()) {
+                subcategoryQueue.addQueue(() -> this.getTopics(subcategories.get(0)));
+            } else {
+                subcategories.forEach(subcategory -> subcategoryQueue.addQueue(() -> this.getTopics(subcategory)));
+            }
+        });
+    }
+
+    private void fillTopicQueue(List<List<CourseType>> topicList) {
+        topicList.forEach(topics -> {
+            if(limitedData && !topics.isEmpty()) {
+                topicQueue.addQueue(() -> this.saveFirstCoursePage(topics.get(0)));
+            } else {
+                topics.forEach(topic -> topicQueue.addQueue(() -> this.saveFirstCoursePage(topic)));
+            }
+        });
+    }
+
+    private void fillCoursePageQueue(List<Pagination> coursePageList) {
+        coursePageList.forEach(coursePage -> coursePageQueue.addQueue(() -> this.saveOtherCoursePages(coursePage)));
     }
 
     private List<CourseType> getCategories() {
@@ -153,9 +179,9 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     private Boolean saveOtherCoursePages(Pagination pagination) throws InterruptedException {
-        Thread.sleep(threadSleepTime);
         CourseType topic = pagination.getTopic();
         while(Objects.nonNull(pagination.getNext())) {
+            Thread.sleep(threadSleepTime);
             String url = UDEMY_URL + pagination.getNext().getUrl();
             CourseList courseList = requestCourseApi(url);
             saveCourses(topic, courseList);
