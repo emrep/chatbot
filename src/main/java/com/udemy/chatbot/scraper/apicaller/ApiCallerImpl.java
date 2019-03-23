@@ -29,7 +29,11 @@ public class ApiCallerImpl implements ApiCaller {
             ApiCallSupplier<List<CourseType>> apiCallSupplier = apiCallQueue.getNext();
             try {
                 Future<List<CourseType>> future = executorService.submit(apiCallSupplier::get);
-                resultList.addAll(future.get());
+                if(limitedData) {
+                    resultList.add(future.get().get(0));
+                } else {
+                    resultList.addAll(future.get());
+                }
                 apiCallQueue.addComplete(apiCallSupplier);
             } catch (Exception e) {
                 apiCallQueue.addFailed(apiCallSupplier);
