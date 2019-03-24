@@ -80,7 +80,6 @@ public class ScraperServiceImpl implements ScraperService {
             scrapingState = EnumScrapingState.FAILED;
             return;
         }
-
         scrapeCourses();
     }
 
@@ -154,7 +153,18 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     private void fillCoursePageQueue(List<Pagination> coursePageList) {
-        coursePageList.forEach(coursePage -> coursePageQueue.addQueue(() -> this.saveOtherCoursePages(coursePage)));
+        coursePageList.forEach(coursePage -> {
+            for(int pageNumber = coursePage.getCurrentPage() + 1; pageNumber <= coursePage.getTotalPage(); pageNumber++ ) {
+                Pagination pagination = new Pagination();
+                pagination.setTopic(coursePage.getTopic());
+                Next next = new Next();
+                String url = coursePage.getNext().getUrl();
+                String []urlParts = url.split("&p=");
+                next.setUrl(urlParts[0] + "&p=" + pageNumber + "&page_size=" + pageSize);
+                pagination.setNext(next);
+                coursePageQueue.addQueue(() -> this.saveNextCoursePage(pagination));
+            }
+        });
     }
 
     private List<CourseType> getCategories() {
@@ -191,15 +201,11 @@ public class ScraperServiceImpl implements ScraperService {
         return pagination;
     }
 
-    private Boolean saveOtherCoursePages(Pagination pagination) throws InterruptedException {
+    private Boolean saveNextCoursePage(Pagination pagination) {
         CourseType topic = pagination.getTopic();
-        while(Objects.nonNull(pagination.getNext())) {
-            Thread.sleep(threadSleepTime);
-            String url = UDEMY_URL + pagination.getNext().getUrl();
-            CourseList courseList = requestCourseApi(url);
-            saveCourses(topic, courseList);
-            pagination = courseList.getUnit().getPagination();
-        }
+        String url = UDEMY_URL + pagination.getNext().getUrl();
+        CourseList courseList = requestCourseApi(url);
+        saveCourses(topic, courseList);
         return true;
     }
 
@@ -210,6 +216,12 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     private CourseList requestCourseApi(String url) {
+        try {
+            Thread.sleep(threadSleepTime);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted!", e);
+            Thread.currentThread().interrupt();
+        }
         CourseList courseList = restTemplate.getForObject(url, CourseList.class);
         log.info("Requested URL: {}", url);
         return courseList;
