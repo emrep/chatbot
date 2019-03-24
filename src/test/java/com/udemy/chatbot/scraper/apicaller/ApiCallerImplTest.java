@@ -33,7 +33,7 @@ class ApiCallerImplTest {
     }
 
     @Test
-    @DisplayName("When getting an exception during an api request, add the api request to the Failed Queue")
+    @DisplayName("move the api request to the Failed Queue When getting an exception from an api request")
     void addFailedQueue() {
         ApiCallQueue<Pagination> apiCallQueue = new ApiCallQueue<>();
         apiCallQueue.addQueue(() -> {throw new Exception();});

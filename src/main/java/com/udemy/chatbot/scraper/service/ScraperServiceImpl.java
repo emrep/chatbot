@@ -59,7 +59,18 @@ public class ScraperServiceImpl implements ScraperService {
     }
 
     @Override
-    public boolean scrapeContent() {
+    public void bootContentScraper() {
+        // TODO: 22-Mar-19 Scheduling a 'Retry Scraping Task'
+        while(!scrapingState.equals(EnumScrapingState.COMPLETED)) {
+            if(scrapingState.equals(EnumScrapingState.NOT_STARTED) || scrapingState.equals(EnumScrapingState.FAILED)) {
+                scrapeContent();
+            } else if(scrapingState.equals(EnumScrapingState.PARTIALLY_COMPLETED)) {
+                retryFailedScrapingRequests();
+            }
+        }
+    }
+
+    private void scrapeContent() {
         scrapingState = EnumScrapingState.IN_PROGRESS;
         scraperRepository.dropCollection();
 
@@ -67,25 +78,29 @@ public class ScraperServiceImpl implements ScraperService {
 
         if(categoryList.isEmpty()) {
             scrapingState = EnumScrapingState.FAILED;
-            return false;
+            return;
         }
 
-        return scrapeCourses();
+        scrapeCourses();
     }
 
-    @Override
-    public boolean retryFailedScrapingRequests() {
+    private void retryFailedScrapingRequests() {
         scrapingState = EnumScrapingState.RETRYING;
         categoryQueue.moveFailedToQueued();
         subcategoryQueue.moveFailedToQueued();
         topicQueue.moveFailedToQueued();
         coursePageQueue.moveFailedToQueued();
-        return scrapeCourses();
+        scrapeCourses();
     }
 
     @Override
     public EnumScrapingState getScrapingState() {
         return scrapingState;
+    }
+
+    @Override
+    public void setScrapingState(EnumScrapingState scrapingState) {
+        this.scrapingState = scrapingState;
     }
 
     private List<CourseType> scrapeCategories() {
@@ -94,7 +109,7 @@ public class ScraperServiceImpl implements ScraperService {
         return categoryList;
     }
 
-    private boolean scrapeCourses() {
+    private void scrapeCourses() {
         List<List<CourseType>> subCategoryList = apiCaller.run(categoryQueue, true);
 
         fillSubcategoryQueue(subCategoryList);
@@ -116,8 +131,6 @@ public class ScraperServiceImpl implements ScraperService {
         } else {
             scrapingState = EnumScrapingState.PARTIALLY_COMPLETED;
         }
-
-        return isSuccessful;
     }
 
     private void fillSubcategoryQueue(List<List<CourseType>> subCategoryList) {

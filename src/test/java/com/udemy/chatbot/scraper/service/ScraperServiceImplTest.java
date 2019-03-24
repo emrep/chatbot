@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -64,30 +65,8 @@ class ScraperServiceImplTest {
         Pagination pagination = new Pagination();
         courseList.getUnit().setPagination(pagination);
         doReturn(courseList).when(restTemplate).getForObject(anyString(), eq(CourseList.class));
-
-        assertTrue(scraperService.scrapeContent());
-    }
-
-    @Test
-    @DisplayName("handle exceptions while scraping the content")
-    void handleExceptions() {
-        apiCaller.setThreadNumber(1);
-
-        courseTypeList.getResults().addAll(Arrays.asList(new CourseType(), new CourseType(), new CourseType()));
-        List<CourseType> courseTypes = Arrays.asList(new CourseType(), new CourseType(), new CourseType(), new CourseType(), new CourseType(), new CourseType());
-        when(restTemplate.getForObject(anyString(), eq(CourseTypeList.class))).thenReturn(courseTypeList);
-        when(courseTypeList.getResults()).thenReturn(courseTypes);
-
-        CourseList courseList = new CourseList();
-        courseList.setUnit(new CourseUnit());
-        courseList.getUnit().setItems(Arrays.asList(new Course(), new Course(), new Course(), new Course()));
-        Pagination pagination = new Pagination();
-        courseList.getUnit().setPagination(pagination);
-        doThrow(new RuntimeException()).when(restTemplate).getForObject(anyString(), eq(CourseList.class));
-
-        boolean isSuccessful = scraperService.scrapeContent();
-        assertFalse(topicQueue.isFailedQueueEmpty());
-        assertFalse(isSuccessful);
+        scraperService.bootContentScraper();
+        assertEquals(EnumScrapingState.COMPLETED, scraperService.getScrapingState());
     }
 
     @Test
@@ -107,11 +86,13 @@ class ScraperServiceImplTest {
         courseList.getUnit().setPagination(pagination);
         doReturn(courseList).when(restTemplate).getForObject(anyString(), eq(CourseList.class));
 
-        assertTrue(scraperService.scrapeContent());
+        scraperService.bootContentScraper();
+        assertEquals(EnumScrapingState.COMPLETED, scraperService.getScrapingState());
     }
 
+
     @Test
-    @DisplayName("try to rescraping the failed content")
+    @DisplayName("rescrape the failed content")
     void retryFailedScrapingRequests() {
         apiCaller.setThreadNumber(3);
         courseTypeList.getResults().addAll(Arrays.asList(new CourseType(), new CourseType(), new CourseType()));
@@ -130,6 +111,9 @@ class ScraperServiceImplTest {
         topicQueue.addFailed(Pagination::new);
         coursePageQueue.addFailed(() -> true);
         coursePageQueue.addFailed(() -> true);
-        assertTrue(scraperService.retryFailedScrapingRequests());
+        scraperService.setScrapingState(EnumScrapingState.PARTIALLY_COMPLETED);
+
+        scraperService.bootContentScraper();
+        assertEquals(EnumScrapingState.COMPLETED, scraperService.getScrapingState());
     }
 }
