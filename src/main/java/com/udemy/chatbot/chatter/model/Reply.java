@@ -5,15 +5,12 @@ import com.udemy.chatbot.scraper.model.Course;
 import com.udemy.chatbot.scraper.model.EnumScrapingState;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Reply implements Serializable {
-    private static final long serialVersionUID = -8017228644483881284L;
-
+public class Reply {
     private String message;
     private List<Course> courses;
     private EnumScrapingState scrapingState;

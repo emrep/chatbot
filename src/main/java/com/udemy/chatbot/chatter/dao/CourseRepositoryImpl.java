@@ -12,13 +12,12 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
 public class CourseRepositoryImpl implements CustomCourseRepository {
 
+    public static final String IGNORE_CASE_REGEX = "(?i)\\b";
     private final MongoOperations operations;
 
     @Value("${chatbot.suggested.course.number}")
@@ -36,9 +35,9 @@ public class CourseRepositoryImpl implements CustomCourseRepository {
         final Query query = new Query();
 
         if(!topic.isEmpty()) {
-            Criteria topicCriteria = Criteria.where("topic").regex("(?i)\\b" + topic + "\\b");
-            Criteria titleCriteria = Criteria.where("title").regex("(?i)\\b" + topic + "\\b");
-            Criteria headlineCriteria = Criteria.where("headline").regex("(?i)\\b" + topic + "\\b");
+            Criteria topicCriteria = Criteria.where("topic").regex(IGNORE_CASE_REGEX + topic + "\\b");
+            Criteria titleCriteria = Criteria.where("title").regex(IGNORE_CASE_REGEX + topic + "\\b");
+            Criteria headlineCriteria = Criteria.where("headline").regex(IGNORE_CASE_REGEX + topic + "\\b");
             query.addCriteria(new Criteria().orOperator(topicCriteria,titleCriteria, headlineCriteria));
         }
 
@@ -48,7 +47,7 @@ public class CourseRepositoryImpl implements CustomCourseRepository {
         }
 
         if(!level.isEmpty()) {
-            query.addCriteria(Criteria.where("instructionalLevel").regex("(?i)\\b" + level + "\\b"));
+            query.addCriteria(Criteria.where("instructionalLevel").regex(IGNORE_CASE_REGEX + level + "\\b"));
         }
 
         if(!sort.isEmpty()) {

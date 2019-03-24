@@ -33,16 +33,17 @@
 + [*] do you have * (@coursenoun)*
 - <set topic=<star1>>Yes We have great <star1> <star2>s in our catalog.
 
-+ i (@desireverb) [to] [learn|know] *
++ i (@desireverb) [to] [@learnverb] *
 - <set topic=<star2>>Yes We have great tutorials related to <star2> in our catalog.
 
 + [@modalverb] [you] (@teachnoun) [me] [the|a|an] * [@coursenoun]
 - <set topic=<star2>>Yes of course we <star1>.
 
-+ [@modalverb] [i] (learn|know) [the|a|an] * [@coursenoun]
++ [@modalverb] [i] (@learnverb) [the|a|an] * [@coursenoun]
 - <set topic=<star2>>Yes of course you <star1>.
 
-
++ [@modalverb] [you] (@listverb) [me] [the|a|an] * [@coursenoun]
+- <set topic=<star2>>Yes of course we <star1>.
 
 + [@modalverb] [you] [@listverb] [me] [the|a|an] (@pricenoun) [the|a|an] [@coursenoun]
 - <set price=<star1>>Definitely.
