@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -27,8 +29,14 @@ public class Course {
     private String url;
     @JsonProperty("is_paid")
     private boolean paid;
+    @JsonProperty("price_detail")
+    private Price price;
     @JsonProperty("visible_instructors")
     private List<Instructor> instructors;
+    @JsonProperty("published_time")
+    private LocalDate publishedTime;
+    @JsonProperty("instructional_level_simple")
+    private String instructionalLevel;
 
     public Course() {
     }

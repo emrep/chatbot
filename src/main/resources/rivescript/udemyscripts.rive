@@ -3,12 +3,13 @@
 // Udemy Scripts
 
 // Substitutions
-! sub the highest rated = popular
-! sub the most expensive = expensive
-! sub the cheapest = cheapest
-! sub the newest = newest
+! sub highest rated = popular
+! sub most expensive = expensive
+! sub cheapest = cheapest
+! sub newest = newest
+! sub best seller = bestseller
 
-! array coursenoun = course lesson lecture tutorial class
+! array coursenoun = course courses lesson lessons lecture lectures tutorial tutorials class classes
 ! array teachnoun = teach train tutor educate
 ! array modalverb = can could may will would
 ! array learnverb = learn know
@@ -16,48 +17,59 @@
 ! array desireverb = desire want need
 ! array levelnoun = beginner intermediate expert
 ! array pricenoun = free paid
-! array sortnoun = newest cheapest expensive popular
+! array sortnoun = newest cheapest expensive popular bestseller
+! array articles = the a an
 
 + *
-- I'm not sure I understand you fully. For instance you can try following messages:
-^ * List web development courses.
-^ * Show me free lectures.
-
-+ [*] do you have * (@coursenoun)*
-- <set topic=<star1>>Yes We have great <star1> <star2>s in our catalog. You may want to take a look at the following courses:
-
-+ [*] (@coursenoun)[*]
-- Hey! We have great <star>s in our catalog. Let me know what kind of courses you are looking for? For example;
+- I'm not sure I understand you fully. Tell me more. What do you want to learn? For instance your answers can be like these:
+^ * List web development courses
+^ * Show me free lectures
+^ * I want to learn finance
 ^ * I am looking for PHP courses.
 ^ * Would you list Finance classes?
-
-+ i (@desireverb) [to] [@learnverb] *
-- <set topic=<star2>>Yes We have great tutorials related to <star2> in our catalog. You may want to take a look at the following courses:
 
 + (hello|hi|hey|howdy|hola|hai|yo)
 - How do you do. Please let me know what kind of courses you want to take.
 - Hi. How can I help you?
 
-+ (@modalverb) you (@teachnoun) [me] *
-- <set topic=<star3>>Yes of course we <star1>. The following courses can be helpful!!
++ * (@coursenoun)
+- <set topic=<star1>>Yes We have great <star1> <star2>s in our catalog.
 
-+ (@modalverb) i (@learnverb) *
-- <set topic=<star3>>Yes of course you <star1>. The following courses can be helpful!!
++ [*] do you have * (@coursenoun)*
+- <set topic=<star1>>Yes We have great <star1> <star2>s in our catalog.
 
-+ [@modalverb] [you] (@listverb) [me] * [@coursenoun]*
-- <set topic=<star2>>Yes of course. Please take a look at the following courses:
++ i (@desireverb) [to] [@learnverb] *
+- <set topic=<star2>>Yes We have great tutorials related to <star2> in our catalog.
 
-+ [@modalverb] [you] (@listverb) [me] (@pricenoun) [*] [@coursenoun]*
-- Definitely. Please take a look at the following the <star2> courses:
++ [@modalverb] [you] [@listverb] [me] [the|a|an] * [@coursenoun]
+- <set topic=<star1>>Yes of course. We have great <star1> <star2>s in our catalog.
 
-+ [@modalverb] [you] (@listverb) [me] (@levelnoun) [*] [@coursenoun]*
-- Yes sure. Please take a look at the following the <star2> courses:
++ [@modalverb] [you] [@listverb] [me] [the|a|an] (@pricenoun) [the|a|an] [@coursenoun]
+- <set price=<star1>>Definitely.
 
-+ [@modalverb] [you] (@listverb) [me] (@sortnoun) [*] [@coursenoun]*
-- Of course. Please take a look at the following the <star2> courses:
++ [@modalverb] [you] [@listverb] [me] [the|a|an] (@pricenoun) [the|a|an] * [@coursenoun]
+- <set price=<star1>><set topic=<star2>>Definitely.
 
-+ [@modalverb] [you] (@listverb) [me] (all|whole) [@coursenoun][*]
++ [@modalverb] [you] [@listverb] [me] [the|a|an] (@levelnoun) [the|a|an] [@coursenoun]
+- <set level=<star1>>Yes sure.
+
++ [@modalverb] [you] [@listverb] [me] [the|a|an] (@levelnoun) [the|a|an] * [@coursenoun]
+- <set level=<star1>><set topic=<star2>>Yes sure.
+
++ [@modalverb] [you] [@listverb] [me] [the|a|an] (@sortnoun) [the|a|an] [@coursenoun]
+- <set sort=<star1>>Of course.
+
++ [@modalverb] [you] [@listverb] [me] [the|a|an] (@sortnoun) [the|a|an] * [@coursenoun]
+- <set sort=<star1>><set topic=<star2>>Of course.
+
++ [@modalverb] [you] [@listverb] [me] (all|whole) [@coursenoun][*]
 - Sorry!! I can not do that because this is so big data :(
 
-+ [*] (looking for|search|seek) * [@coursenoun]*
-- <set topic=<star2>>We have very nice suggestions. We hope the following courses are what you are exactly looking for:
++ [*] (looking for|search|seek) [the|a|an] * [@coursenoun]
+- <set topic=<star2>>We have very nice suggestions.
+
++ (@modalverb) you (@teachnoun) [me] *
+- <set topic=<star3>>Yes of course we <star1>.
+
++ (@modalverb) i (@learnverb) *
+- <set topic=<star3>>Yes of course you <star1>.

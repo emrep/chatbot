@@ -5,5 +5,5 @@ import com.udemy.chatbot.scraper.model.Course;
 import java.util.List;
 
 public interface CustomCourseRepository {
-    List<Course> findCourses(String topic, int page);
+    List<Course> findCourses(String topic, String price, String level, String sort, int page);
 }
