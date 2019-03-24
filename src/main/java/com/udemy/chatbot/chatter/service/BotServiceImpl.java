@@ -16,9 +16,9 @@ public class BotServiceImpl implements BotService {
     private static final  String []COURSE_LIST_MESSAGES = {"You may want to take a look at the following courses:",
             "The following courses can be helpful!!", "Please take a look at the following courses:",
             "We hope the following courses are what you are exactly looking for:"};
-    private static final String NOT_FOUND_COURSE_MESSAGE = "Sorry!! We could not find any course that is related to the keywords you entered";
+    public static final String NOT_FOUND_COURSE_MESSAGE = "Sorry!! We could not find any course that is related to the keywords you entered";
 
-    private static final String BOT_VAR_TOPIC = "topic";
+    public static final String BOT_VAR_TOPIC = "topic";
     private static final String BOT_VAR_PRICE = "price";
     private static final String BOT_VAR_LEVEL = "level";
     private static final String BOT_VAR_SORT = "sort";

@@ -21,12 +21,7 @@
 ! array articles = the a an
 
 + *
-- I'm not sure I understand you fully. Tell me more. What do you want to learn? For instance your answers can be like these:
-^ * List web development courses
-^ * Show me free lectures
-^ * I want to learn finance
-^ * I am looking for PHP courses.
-^ * Would you list Finance classes?
+- <set topic=<star>>
 
 + (hello|hi|hey|howdy|hola|hai|yo)
 - How do you do. Please let me know what kind of courses you want to take.
@@ -38,11 +33,16 @@
 + [*] do you have * (@coursenoun)*
 - <set topic=<star1>>Yes We have great <star1> <star2>s in our catalog.
 
-+ i (@desireverb) [to] [@learnverb] *
++ i (@desireverb) [to] [learn|know] *
 - <set topic=<star2>>Yes We have great tutorials related to <star2> in our catalog.
 
-+ [@modalverb] [you] [@listverb] [me] [the|a|an] * [@coursenoun]
-- <set topic=<star1>>Yes of course. We have great <star1> <star2>s in our catalog.
++ [@modalverb] [you] (@teachnoun) [me] [the|a|an] * [@coursenoun]
+- <set topic=<star2>>Yes of course we <star1>.
+
++ [@modalverb] [i] (learn|know) [the|a|an] * [@coursenoun]
+- <set topic=<star2>>Yes of course you <star1>.
+
+
 
 + [@modalverb] [you] [@listverb] [me] [the|a|an] (@pricenoun) [the|a|an] [@coursenoun]
 - <set price=<star1>>Definitely.
@@ -67,9 +67,3 @@
 
 + [*] (looking for|search|seek) [the|a|an] * [@coursenoun]
 - <set topic=<star2>>We have very nice suggestions.
-
-+ (@modalverb) you (@teachnoun) [me] *
-- <set topic=<star3>>Yes of course we <star1>.
-
-+ (@modalverb) i (@learnverb) *
-- <set topic=<star3>>Yes of course you <star1>.
