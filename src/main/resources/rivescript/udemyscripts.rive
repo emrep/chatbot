@@ -37,13 +37,13 @@
 - <set topic=<star2>>Yes We have great tutorials related to <star2> in our catalog.
 
 + [@modalverb] [you] (@teachnoun) [me] [the|a|an] * [@coursenoun]
-- <set topic=<star2>>Yes of course we <star1>.
+- <set topic=<star2>>Yes of course we can <star1>.
 
 + [@modalverb] [i] (@learnverb) [the|a|an] * [@coursenoun]
-- <set topic=<star2>>Yes of course you <star1>.
+- <set topic=<star2>>Yes of course you can <star1>.
 
 + [@modalverb] [you] (@listverb) [me] [the|a|an] * [@coursenoun]
-- <set topic=<star2>>Yes of course we <star1>.
+- <set topic=<star2>>Yes of course we can <star1>.
 
 + [@modalverb] [you] [@listverb] [me] [the|a|an] (@pricenoun) [the|a|an] [@coursenoun]
 - <set price=<star1>>Definitely.
