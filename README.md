@@ -10,7 +10,7 @@ As testing frameworks, [JUnit 5](https://junit.org/junit5/) and [Mockito](https:
 
 ### Application Parameters 
 Parameters of the Aplication can be easily changed with changing application.properties file. Each parameter is explained below: <br />
-server.port: application port <br />
+**server.port:** application port <br />
 **api.request.proxy.url:** If there is a proxy in the network, It is supposed to be set the proxy url for requesting Udemy Restful APIs <br />
 **api.request.proxy.port:** If there is a proxy in the network, It is supposed to be set the proxy port for requesting Udemy Restful APIs <br />
 **api.request.thread.number:** It sets how many multiple API requests can be made happen at the same time <br />
@@ -19,19 +19,19 @@ server.port: application port <br />
 **scraper.limited.data:** It is used for testing smaller of data <br />
 **chatbot.suggested.course.number:** It sets how many suggested course will be returned to the user <br />
 
-### Spring Parameters 
+### Build
 After setting the parameters of the aplication, The application can be easily up running the boot class named ChatbotApplication. The application is also dockerized. 
 Therefore, the application [docker](https://www.docker.com/) image can be created using [Maven](https://maven.apache.org/) command that is `mvn package docker:build`. 
 There is a docker-compose.yml in src/main/docker. The application can be easily up running the docker command that is `docker-compose up -d` in src/main/docker  
 
 ### Api usage
 The application can answer the questions. For instance the questions can be like these: <br />
-http://localhost:8060/chatbot/List web development courses <br />
-http://localhost:8060/chatbot/Show me free lectures <br />
-http://localhost:8060/chatbot/I want to learn finance <br />
-http://localhost:8060/chatbot/I am looking for PHP courses <br />
-http://localhost:8060/chatbot/Would you list Finance classes? <br />
-http://localhost:8060/chatbot/Show me the best seller java courses <br />
+/chatbot/List web development courses <br />
+/chatbot/Show me free lectures <br />
+/chatbot/I want to learn finance <br />
+/chatbot/I am looking for PHP courses <br />
+/chatbot/Would you list Finance classes? <br />
+/chatbot/Show me the best seller java courses <br />
 
  
 
