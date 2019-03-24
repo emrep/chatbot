@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ApiCallerImpl implements ApiCaller {
 
-    @Value("${api.caller.thread.number}")
+    @Value("${api.request.thread.number}")
     private @Setter int threadNumber;
 
     @Override

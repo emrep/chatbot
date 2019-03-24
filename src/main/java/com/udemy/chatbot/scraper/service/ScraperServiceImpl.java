@@ -32,9 +32,9 @@ public class ScraperServiceImpl implements ScraperService {
 
     @Value("${scraper.page.size}")
     private String pageSize;
-    @Value("${limited.data}")
+    @Value("${scraper.limited.data}")
     private boolean limitedData;
-    @Value("${api.caller.thread.sleep.time}")
+    @Value("${api.request.thread.sleep.time}")
     private long threadSleepTime;
 
     private EnumScrapingState scrapingState = EnumScrapingState.NOT_STARTED;
