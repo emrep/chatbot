@@ -21,11 +21,11 @@ import java.util.Objects;
 @EnableAsync
 public class SpringConfig implements AsyncConfigurer {
 
-    @Value("${proxy.url}")
+    @Value("${api.request.proxy.url}")
     private String proxyUrl;
 
-    @Value("${proxy.port}")
-    private int proxyPort;
+    @Value("${api.request.proxy.port}")
+    private Integer proxyPort;
 
     @Bean
     public RestTemplate restTemplate() {
